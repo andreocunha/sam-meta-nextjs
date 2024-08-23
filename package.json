@@ -9,16 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "konva": "^9.3.14",
+    "next": "14.2.5",
+    "onnxruntime-web": "^1.19.0",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.5"
+    "react-konva": "^18.2.10",
+    "react-zoom-pan-pinch": "3.4.4",
+    "simplify-js": "^1.2.4",
+    "use-image": "^1.1.1"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
