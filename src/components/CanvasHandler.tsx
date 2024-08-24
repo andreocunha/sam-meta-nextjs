@@ -7,8 +7,18 @@ export const CanvasHandler: React.FC = () => {
   const { 
     handleMouseDown, 
     handleMouseMove, 
-    handleMouseUp 
+    handleMouseUp,
+    loading,
+    error 
   } = useCanvas(canvasRef);
+
+  if(error) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <TransformWrapper
@@ -26,6 +36,7 @@ export const CanvasHandler: React.FC = () => {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onContextMenu={(e) => e.preventDefault()}
+              style={{ filter: loading ? 'blur(5px)' : 'none' }}
             />
           </div>
         </TransformComponent>
