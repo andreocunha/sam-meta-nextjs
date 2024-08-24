@@ -1,18 +1,18 @@
 import * as ort from 'onnxruntime-web';
 import { MODEL_PATH } from '@/constants/paths';
 
-// if (typeof window !== 'undefined') {
-//   // Executar apenas no cliente
-//   ort.env.debug = false;
-//   ort.env.logLevel = 'verbose';
-//   ort.env.wasm.numThreads = 2;
-//   ort.env.wasm.wasmPaths = {
-//     'ort-wasm.wasm': '/ort-wasm.wasm',
-//     'ort-wasm-simd.wasm': '/ort-wasm-simd.wasm',
-//     'ort-wasm-threaded.wasm': '/ort-wasm-threaded.wasm',
-//     'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
-//   } as any;
-// }
+ort.env.debug = false;
+// set global logging level
+ort.env.logLevel = 'verbose';
+ort.env.wasm.numThreads = 2;
+ort.env.wasm.simd = true;
+ort.env.wasm.wasmPaths = {
+  'ort-wasm.wasm': '/ort-wasm.wasm',
+  'ort-wasm-simd.wasm': '/ort-wasm-simd.wasm',
+  'ort-wasm-threaded.wasm': '/ort-wasm-threaded.wasm',
+  'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
+} as any;
+
 
 let ortSession: ort.InferenceSession | null = null;
 let imageEmbeddingT: ort.Tensor | null = null;
