@@ -122,3 +122,63 @@ export async function handleCanvasClick(
     // Atualizar a lista de máscaras
     setMaskDataList(prev => [...prev, newMaskData]);
 }
+
+
+export function createMaskFromDrawing(
+    canvas: HTMLCanvasElement,
+    points: { x: number; y: number }[],
+    setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>
+) {
+    if (!originalImageData) return;
+
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Criar um novo canvas para desenhar e preencher a área do contorno
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    // Desenhar o contorno no novo canvas
+    tempCtx.fillStyle = 'white'; // A cor branca representa a área que será a máscara
+    tempCtx.beginPath();
+    tempCtx.moveTo(points[0].x, points[0].y);
+    points.forEach(point => {
+        tempCtx.lineTo(point.x, point.y);
+    });
+    tempCtx.closePath();
+    tempCtx.fill(); // Preencher a área delimitada pelo contorno
+
+    // Extrair a imagem preenchida do tempCanvas e converter para máscara
+    const imageData = tempCtx.getImageData(0, 0, width, height);
+    const maskData = new Float32Array(width * height);
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const index = (y * width + x) * 4;
+            const alpha = imageData.data[index + 3]; // Verifica o canal alpha
+            maskData[y * width + x] = alpha > 0 ? 1.0 : 0.0;
+        }
+    }
+
+    // Escurecer a imagem na primeira vez que uma máscara é adicionada
+    if (isFirstMask) {
+        ctx.putImageData(originalImageData, 0, 0);
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, width, height);
+        ctx.globalAlpha = 1.0;
+        isFirstMask = false;
+    }
+
+    // Destacar a área da máscara
+    highlightMaskArea(ctx, maskData, originalImageData);
+
+    // Atualizar a lista de máscaras
+    setMaskDataList(prev => [...prev, maskData]);
+}

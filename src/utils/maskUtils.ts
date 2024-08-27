@@ -80,7 +80,7 @@ export function removeMaskHighlight(
     const width = ctx.canvas.width;
     const height = ctx.canvas.height;
     const lineWidth = Math.max(1, Math.floor(width / 250));
-    const halfLineWidth = Math.floor(lineWidth / 2);
+    const halfLineWidth = Math.floor(lineWidth / 2) + 1;
     const imageData = ctx.getImageData(0, 0, width, height);
     const data = imageData.data;
 
@@ -89,7 +89,6 @@ export function removeMaskHighlight(
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const index = y * width + x;
-            const pixelIndex = index * 4;
 
             if (maskData[index] > 0.0 || isEdge(x, y, width, height, maskData)) {
                 for (let dy = -halfLineWidth; dy <= halfLineWidth; dy++) {
