@@ -47,7 +47,11 @@ export const CanvasHandler: React.FC = () => {
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
           <TransformComponent>
             <div className="w-full h-full min-h-screen flex flex-col justify-center items-center relative">
-              {loading && <div className="loading-circle"></div>}
+              {loading && 
+              <div className='absolute w-full h-screen top-0 left-0 z-20 flex items-center justify-center'>
+                <div className="loading-circle" />
+              </div>
+              }
               <canvas
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Adicione este CSS no seu arquivo de estilos ou dentro de uma tag <style> */
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -15,10 +15,8 @@
     width: 60px;
     height: 60px;
     animation: spin 1s linear infinite;
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000; /* Certifique-se de que esteja sobrepondo outros elementos */
   }
   
