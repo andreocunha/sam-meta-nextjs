@@ -78,6 +78,16 @@ export async function handleCanvasClick(
     const y = (event.clientY - rect.top) * (canvas.height / rect.height);
     const pt = [x, y];
 
+    // Salvar o estado atual da imagem antes de desenhar o ponto e o arco
+    const imageDataBeforeDraw = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    // Desenhar ponto e arco temporários
+    drawPointAndArc(ctx, x, y);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Restaurar a imagem ao estado anterior (remove ponto e arco)
+    ctx.putImageData(imageDataBeforeDraw, 0, 0);
+
     // Verificar se o clique está em uma máscara existente
     const clickedMaskIndex = maskDataList.findIndex(mask => isPointInMask(x, y, mask, canvas.width));
 
@@ -94,7 +104,7 @@ export async function handleCanvasClick(
 
     // Criar a nova máscara
     const newMaskData = await runSam([pt]);
-    if(!verifyMaskSize(newMaskData)) return;
+    if (!verifyMaskSize(newMaskData)) return;
 
     // Escurecer a imagem na primeira vez que uma máscara é adicionada
     if (isFirstMask) {
