@@ -69,7 +69,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
       if (ctx) {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        // ctx.lineWidth = 10;
+        ctx.strokeStyle = 'rgba(255, 0, 0)';
         const width = canvasRef.current.width;
         ctx.lineWidth = Math.max(1, Math.floor(width / 500));
 

@@ -3,7 +3,6 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useCanvas } from '@/hooks/useCanvas';
 import { toggleScrollAndTouchBehavior } from '@/utils/touch';
 
-
 export const CanvasHandler: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { 
@@ -36,7 +35,7 @@ export const CanvasHandler: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="relative">
       <button onClick={toggleDrawingMode} className="p-2 bg-blue-500 text-white absolute top-0 right-0 m-4 z-10">
         {isDrawing ? 'Desativar modo desenho' : 'Ativar modo desenho'}
       </button>
@@ -47,9 +46,8 @@ export const CanvasHandler: React.FC = () => {
       >
         {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
           <TransformComponent>
-            <div
-              className="w-full h-full min-h-screen flex flex-col justify-center items-center"
-            >
+            <div className="w-full h-full min-h-screen flex flex-col justify-center items-center relative">
+              {loading && <div className="loading-circle"></div>}
               <canvas
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}
