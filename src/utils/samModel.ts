@@ -2,7 +2,6 @@ import * as ort from 'onnxruntime-web';
 import { MODEL_PATH } from '@/constants/paths';
 
 ort.env.debug = false;
-// set global logging level
 ort.env.logLevel = 'verbose';
 ort.env.wasm.numThreads = 2;
 ort.env.wasm.simd = true;

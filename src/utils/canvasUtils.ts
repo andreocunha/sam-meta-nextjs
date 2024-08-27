@@ -1,9 +1,10 @@
 import { setImageEmbedding, runSam } from '@/utils/samModel';
-import { drawMask, removeMask, updateCanvasVisuals } from '@/utils/maskUtils';
+import { drawPointAndArc, highlightMaskArea, isPointInMask, removeMaskHighlight, verifyMaskSize } from '@/utils/maskUtils';
 import { IMAGE_SRC, EMBEDDING_SRC } from '@/constants/paths';
 
 let originalImageData: ImageData | null = null;
 let imageEmbedding: Float32Array | null = null;
+let isFirstMask = true;
 
 export async function initializeCanvas(canvas: HTMLCanvasElement): Promise<{ success: boolean; message: string }> {
     try {
@@ -77,42 +78,37 @@ export async function handleCanvasClick(
     const y = (event.clientY - rect.top) * (canvas.height / rect.height);
     const pt = [x, y];
 
-    const maskIndexToRemove = maskDataList.findIndex(maskData =>
-        maskData[(Math.floor(y) * canvas.width) + Math.floor(x)] > 0.0
-    );
+    // Verificar se o clique está em uma máscara existente
+    const clickedMaskIndex = maskDataList.findIndex(mask => isPointInMask(x, y, mask, canvas.width));
 
-    // Desenhar o ponto vermelho no centro
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, 2 * Math.PI); // Ponto pequeno de 5px de raio
-    ctx.fill();
-    ctx.closePath();
+    if (clickedMaskIndex !== -1) {
+        // Se clicou em uma máscara existente, remover o destaque dessa máscara
+        const maskToRemove = maskDataList[clickedMaskIndex];
+        const newMaskDataList = maskDataList.filter((_, idx) => idx !== clickedMaskIndex);
+        setMaskDataList(newMaskDataList);
 
-    // Desenhar o arco ao redor do ponto
-    ctx.lineWidth = 20; // Espessura do arco
-    ctx.strokeStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(x, y, 100, 0, 2 * Math.PI); // Arco maior com 50px de raio
-    ctx.stroke();
-    ctx.closePath();
-
-    // Dar um pequeno atraso para que o ponto vermelho e o arco sejam visíveis
-    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms de atraso (ajuste conforme necessário)
-
-    // Limpar o ponto vermelho e o arco antes de atualizar as máscaras
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    updateCanvasVisuals(ctx, originalImageData, maskDataList, canvas.width); // Redesenha o estado atual do canvas sem o ponto e arco vermelhos
-
-    if (maskIndexToRemove >= 0) {
-        const updatedMasks = maskDataList.filter((_, index) => index !== maskIndexToRemove);
-        setMaskDataList(updatedMasks);
-        removeMask(ctx, maskDataList[maskIndexToRemove], originalImageData, canvas.width);
-        updateCanvasVisuals(ctx, originalImageData, updatedMasks, canvas.width);
-    } else {
-        const newMaskData = await runSam([pt]);
-        // console.log('New mask data:', newMaskData);
-        setMaskDataList(prev => [...prev, newMaskData]);
-        drawMask(ctx, newMaskData, canvas.width);
-        updateCanvasVisuals(ctx, originalImageData, [...maskDataList, newMaskData], canvas.width);
+        // Restaurar a área escurecida onde a máscara estava
+        removeMaskHighlight(ctx, maskToRemove, originalImageData);
+        return;
     }
+
+    // Criar a nova máscara
+    const newMaskData = await runSam([pt]);
+    if(!verifyMaskSize(newMaskData)) return;
+
+    // Escurecer a imagem na primeira vez que uma máscara é adicionada
+    if (isFirstMask) {
+        ctx.putImageData(originalImageData!, 0, 0);
+        ctx.globalAlpha = 0.5; // Escurece a imagem
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1.0; // Restaurar alpha para o padrão
+        isFirstMask = false;
+    }
+
+    // Destacar a nova máscara com borda
+    highlightMaskArea(ctx, newMaskData, originalImageData!);
+
+    // Atualizar a lista de máscaras
+    setMaskDataList(prev => [...prev, newMaskData]);
 }
