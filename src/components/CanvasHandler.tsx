@@ -15,14 +15,15 @@ export const CanvasHandler: React.FC = () => {
     handleTouchMove, 
     handleTouchEnd,  
     toggleDrawingMode,  
+    saveAllContoursPoints,
+    setSelectedColor,
+    selectedColor,
     isDrawing,  
     loading,
     error,
-    saveAllContoursPoints,
   } = useCanvas(canvasRef);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedColor, setSelectedColor] = useState('blue');
 
   useEffect(() => {
     toggleScrollAndTouchBehavior(isDrawing);
@@ -31,19 +32,6 @@ export const CanvasHandler: React.FC = () => {
       toggleScrollAndTouchBehavior(false);
     };
   }, [isDrawing]);
-
-  useEffect(() => {
-    setColor(selectedColor);
-  }, [selectedColor]);
-
-  const setColor = (color: string) => {
-    if (!canvasRef.current) return;
-
-    const ctx = canvasRef.current.getContext('2d');
-    if (!ctx) return;
-
-    ctx.strokeStyle = color;
-  };
 
   const colorOptions: { [key: string]: string } = {
     blue: "Livre",

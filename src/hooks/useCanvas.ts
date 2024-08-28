@@ -8,6 +8,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
   const [isDrawingActive, setIsDrawingActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState('blue');
   const startPosition = useRef<{ x: number; y: number } | null>(null);
   const drawingPoints = useRef<{ x: number; y: number }[]>([]);
   const isTouchEvent = useRef(true);
@@ -51,7 +52,8 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
                   canvas,
                   absolutePoints,
                   setMaskDataList,
-                  setCountourPointsList
+                  setCountourPointsList,
+                  selectedColor
                 );
               });
             }
@@ -106,7 +108,8 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
       if (ctx) {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.strokeStyle = 'rgba(255, 0, 0)';
+        // ctx.strokeStyle = 'rgba(255, 0, 0)';
+        ctx.strokeStyle = selectedColor;
         const width = canvasRef.current.width;
         ctx.lineWidth = Math.max(1, Math.floor(width / 500));
   
@@ -129,7 +132,8 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
         canvasRef.current, 
         maskDataList, 
         setMaskDataList,
-        setCountourPointsList
+        setCountourPointsList,
+        selectedColor
       );
     }
   
@@ -144,7 +148,8 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
           canvasRef.current, 
           drawingPoints.current, 
           setMaskDataList,
-          setCountourPointsList
+          setCountourPointsList,
+          selectedColor
         );
   
         drawingPoints.current = [];
@@ -189,8 +194,6 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
     if (!canvasRef.current) return;
   
     const { width, height } = canvasRef.current;
-
-    console.log(countourPointsList);
   
     // save all contours points with relative coordinates in localStorage
     const relativeContours = countourPointsList.map(points => points.map(point => ({
@@ -211,9 +214,11 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
     handleTouchMove: handleMove,   
     handleTouchEnd: handleEnd,    
     toggleDrawingMode,
+    saveAllContoursPoints,
+    setSelectedColor,
+    selectedColor,
     isDrawing,
     loading, 
     error,
-    saveAllContoursPoints
   };
 }

@@ -69,7 +69,8 @@ export async function handleCanvasClick(
     canvas: HTMLCanvasElement,
     maskDataList: Float32Array[],
     setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>,
-    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>
+    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>,
+    color: string = 'blue'
 ) {
     if (!originalImageData || !imageEmbedding) return;
 
@@ -122,7 +123,13 @@ export async function handleCanvasClick(
 
     const countourPoints = getContourPointsFromMask(newMaskData, canvas.width, canvas.height);
 
-    createMaskFromDrawing(canvas, countourPoints, setMaskDataList, setCountourPointsList);
+    createMaskFromDrawing(
+        canvas, 
+        countourPoints, 
+        setMaskDataList, 
+        setCountourPointsList, 
+        color
+    );
 }
 
 
@@ -130,7 +137,8 @@ export function createMaskFromDrawing(
     canvas: HTMLCanvasElement,
     points: { x: number; y: number }[],
     setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>,
-    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>
+    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>,
+    color: string = 'blue'
 ) {
     if (!originalImageData) return;
 
@@ -151,7 +159,6 @@ export function createMaskFromDrawing(
     tempCtx.fillStyle = 'white'; // A cor branca representa a área que será a máscara
     tempCtx.beginPath();
     const countourPoints = getContourPoints(points);
-    console.log("ContourPoints:", countourPoints);
     tempCtx.moveTo(countourPoints[0].x, countourPoints[0].y);
     countourPoints.forEach(point => {
         tempCtx.lineTo(point.x, point.y);
@@ -182,7 +189,7 @@ export function createMaskFromDrawing(
     }
 
     // Destacar a área da máscara
-    highlightMaskArea(ctx, maskData, originalImageData);
+    highlightMaskArea(ctx, maskData, originalImageData, color);
 
     // Atualizar a lista de máscaras
     setMaskDataList(prev => [...prev, maskData]);

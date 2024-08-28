@@ -39,11 +39,12 @@ export function verifyMaskSize(maskData: Float32Array): boolean {
 export function highlightMaskArea(
     ctx: CanvasRenderingContext2D,
     maskData: Float32Array,
-    originalImageData: ImageData
+    originalImageData: ImageData,
+    color: string = 'blue'
 ): { x: number; y: number }[] {
     const width = ctx.canvas.width;
     const height = ctx.canvas.height;
-    const maskColor = [0, 0, 255, 255];
+    // const maskColor = [0, 0, 255, 255];
     const lineWidth = Math.max(1, Math.floor(width / 250));
     const halfLineWidth = lineWidth / 2;
     const imageData = ctx.getImageData(0, 0, width, height);
@@ -61,7 +62,8 @@ export function highlightMaskArea(
 
     // Agora desenhar a linha azul ao redor da borda da máscara
     ctx.putImageData(imageData, 0, 0);
-    ctx.fillStyle = `rgba(${maskColor.join(',')})`;
+    // ctx.fillStyle = `rgba(${maskColor.join(',')})`;
+    ctx.fillStyle = color;
 
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
@@ -147,9 +149,6 @@ export function getContourPointsFromMask(maskData: Float32Array, canvasWidth: nu
             }
         }
     }
-
-    console.log(`Contour points: ${contourPoints.length}`);
-    console.log(contourPoints);
 
     return contourPoints;
 }
