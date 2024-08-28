@@ -69,7 +69,7 @@ export async function handleCanvasClick(
     canvas: HTMLCanvasElement,
     maskDataList: Float32Array[],
     setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>,
-    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>,
+    setCountourPointsList: React.Dispatch<React.SetStateAction<{ points: { x: number; y: number }[], color: string }[]>>,
     color: string = 'blue'
 ) {
     if (!originalImageData || !imageEmbedding) return;
@@ -137,7 +137,7 @@ export function createMaskFromDrawing(
     canvas: HTMLCanvasElement,
     points: { x: number; y: number }[],
     setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>,
-    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>,
+    setCountourPointsList: React.Dispatch<React.SetStateAction<{ points: { x: number; y: number }[], color: string }[]>>,
     color: string = 'blue'
 ) {
     if (!originalImageData) return;
@@ -195,7 +195,7 @@ export function createMaskFromDrawing(
     setMaskDataList(prev => [...prev, maskData]);
 
     // Atualizar a lista de pontos do contorno
-    setCountourPointsList(prev => [...prev, points]);
+    setCountourPointsList(prev => [...prev, { points: countourPoints, color }]);
 }
 
 export function getContourPoints(points: { x: number; y: number }[]): { x: number; y: number }[] {

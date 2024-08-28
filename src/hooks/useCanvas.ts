@@ -3,7 +3,7 @@ import { initializeCanvas, handleCanvasClick, createMaskFromDrawing } from '@/ut
 
 export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
   const [maskDataList, setMaskDataList] = useState<Float32Array[]>([]);
-  const [countourPointsList, setCountourPointsList] = useState<{ x: number; y: number }[][]>([]);
+  const [countourPointsList, setCountourPointsList] = useState<{ points: { x: number; y: number }[], color: string }[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDrawingActive, setIsDrawingActive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -42,8 +42,9 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
   
               const { width, height } = canvas;
   
-              contourPointsList.forEach((relativePoints: any[]) => {
-                const absolutePoints = relativePoints.map(point => ({
+              contourPointsList.forEach((contourData: any) => {
+                const { points, color } = contourData;
+                const absolutePoints = points.map((point: any) => ({
                   x: Math.round(point.x * width),
                   y: Math.round(point.y * height),
                 }));
@@ -53,7 +54,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
                   absolutePoints,
                   setMaskDataList,
                   setCountourPointsList,
-                  selectedColor
+                  color
                 );
               });
             }
@@ -67,6 +68,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
   
     initialize();
   }, [canvasRef]);
+  
   
   
 
@@ -195,14 +197,17 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
   
     const { width, height } = canvasRef.current;
   
-    // save all contours points with relative coordinates in localStorage
-    const relativeContours = countourPointsList.map(points => points.map(point => ({
-      x: point.x / width,
-      y: point.y / height,
-    })));
-
+    const relativeContours = countourPointsList.map(contour => ({
+      points: contour.points.map(point => ({
+        x: point.x / width,
+        y: point.y / height,
+      })),
+      color: contour.color,  // Salva a cor associada ao contorno
+    }));
+  
     localStorage.setItem('contourPointsList', JSON.stringify(relativeContours));
   }
+  
 
   
 
