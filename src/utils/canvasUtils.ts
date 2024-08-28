@@ -1,6 +1,8 @@
 import { setImageEmbedding, runSam } from '@/utils/samModel';
-import { drawPointAndArc, highlightMaskArea, isPointInMask, removeMaskHighlight, verifyMaskSize } from '@/utils/maskUtils';
+import { drawPointAndArc, getContourPointsFromMask, highlightMaskArea, isPointInMask, removeMaskHighlight, verifyMaskSize } from '@/utils/maskUtils';
 import { IMAGE_SRC, EMBEDDING_SRC } from '@/constants/paths';
+import concaveman from 'concaveman';
+
 
 let originalImageData: ImageData | null = null;
 let imageEmbedding: Float32Array | null = null;
@@ -66,7 +68,8 @@ export async function handleCanvasClick(
     event: React.MouseEvent<HTMLCanvasElement>,
     canvas: HTMLCanvasElement,
     maskDataList: Float32Array[],
-    setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>
+    setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>,
+    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>
 ) {
     if (!originalImageData || !imageEmbedding) return;
 
@@ -94,8 +97,9 @@ export async function handleCanvasClick(
     if (clickedMaskIndex !== -1) {
         // Se clicou em uma máscara existente, remover o destaque dessa máscara
         const maskToRemove = maskDataList[clickedMaskIndex];
-        const newMaskDataList = maskDataList.filter((_, idx) => idx !== clickedMaskIndex);
-        setMaskDataList(newMaskDataList);
+        setMaskDataList(prev => prev.filter((_, index) => index !== clickedMaskIndex));
+
+        setCountourPointsList(prev => prev.filter((_, index) => index !== clickedMaskIndex));
 
         // Restaurar a área escurecida onde a máscara estava
         removeMaskHighlight(ctx, maskToRemove, originalImageData);
@@ -116,18 +120,17 @@ export async function handleCanvasClick(
         isFirstMask = false;
     }
 
-    // Destacar a nova máscara com borda
-    highlightMaskArea(ctx, newMaskData, originalImageData!);
+    const countourPoints = getContourPointsFromMask(newMaskData, canvas.width, canvas.height);
 
-    // Atualizar a lista de máscaras
-    setMaskDataList(prev => [...prev, newMaskData]);
+    createMaskFromDrawing(canvas, countourPoints, setMaskDataList, setCountourPointsList);
 }
 
 
 export function createMaskFromDrawing(
     canvas: HTMLCanvasElement,
     points: { x: number; y: number }[],
-    setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>
+    setMaskDataList: React.Dispatch<React.SetStateAction<Float32Array[]>>,
+    setCountourPointsList: React.Dispatch<React.SetStateAction<{ x: number; y: number }[][]>>
 ) {
     if (!originalImageData) return;
 
@@ -147,8 +150,10 @@ export function createMaskFromDrawing(
     // Desenhar o contorno no novo canvas
     tempCtx.fillStyle = 'white'; // A cor branca representa a área que será a máscara
     tempCtx.beginPath();
-    tempCtx.moveTo(points[0].x, points[0].y);
-    points.forEach(point => {
+    const countourPoints = getContourPoints(points);
+    console.log("ContourPoints:", countourPoints);
+    tempCtx.moveTo(countourPoints[0].x, countourPoints[0].y);
+    countourPoints.forEach(point => {
         tempCtx.lineTo(point.x, point.y);
     });
     tempCtx.closePath();
@@ -181,4 +186,18 @@ export function createMaskFromDrawing(
 
     // Atualizar a lista de máscaras
     setMaskDataList(prev => [...prev, maskData]);
+
+    // Atualizar a lista de pontos do contorno
+    setCountourPointsList(prev => [...prev, points]);
+}
+
+export function getContourPoints(points: { x: number; y: number }[]): { x: number; y: number }[] {
+    // Convertendo os pontos para o formato esperado pela biblioteca
+    const pointArray = points.map(p => [p.x, p.y]);
+
+    // Calculando o concave hull
+    const concaveHullPoints = concaveman(pointArray);
+
+    // Convertendo de volta para o formato original
+    return concaveHullPoints.map(([x, y]) => ({ x, y }));
 }

@@ -40,13 +40,15 @@ export function highlightMaskArea(
     ctx: CanvasRenderingContext2D,
     maskData: Float32Array,
     originalImageData: ImageData
-) {
+): { x: number; y: number }[] {
     const width = ctx.canvas.width;
     const height = ctx.canvas.height;
     const maskColor = [0, 0, 255, 255];
     const lineWidth = Math.max(1, Math.floor(width / 250));
     const halfLineWidth = lineWidth / 2;
     const imageData = ctx.getImageData(0, 0, width, height);
+
+    let contourPoints: { x: number; y: number }[] = [];
 
     // Primeiro, restaurar as cores originais na área da máscara
     for (let i = 0; i < maskData.length; i++) {
@@ -64,13 +66,17 @@ export function highlightMaskArea(
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             if (isEdge(x, y, width, height, maskData)) {
+                contourPoints.push({ x, y });
                 ctx.beginPath();
                 ctx.arc(x, y, halfLineWidth, 0, 2 * Math.PI, false);
                 ctx.fill();
             }
         }
     }
+
+    return contourPoints;
 }
+
 
 export function removeMaskHighlight(
     ctx: CanvasRenderingContext2D,
@@ -130,6 +136,24 @@ export function isPointInMask(
     const index = Math.floor(y) * canvasWidth + Math.floor(x);
     return maskData[index] > 0.0;
 }
+
+export function getContourPointsFromMask(maskData: Float32Array, canvasWidth: number, canvasHeight: number): { x: number; y: number }[] {
+    const contourPoints: { x: number; y: number }[] = [];
+
+    for (let y = 0; y < canvasHeight; y++) {
+        for (let x = 0; x < canvasWidth; x++) {
+            if (isEdge(x, y, canvasWidth, canvasHeight, maskData)) {
+                contourPoints.push({ x, y });
+            }
+        }
+    }
+
+    console.log(`Contour points: ${contourPoints.length}`);
+    console.log(contourPoints);
+
+    return contourPoints;
+}
+
 
 export function drawPointAndArc(
     ctx: CanvasRenderingContext2D,
