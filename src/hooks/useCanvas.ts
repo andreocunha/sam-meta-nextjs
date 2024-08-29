@@ -13,6 +13,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
   const drawingPoints = useRef<{ x: number; y: number }[]>([]);
   const isTouchEvent = useRef(true);
   const isMoving = useRef(false);
+  const isProcessing = useRef(false);
 
   useEffect(() => {
     let hasInitialized = false;
@@ -126,10 +127,12 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
 
   const handleEnd = async (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (loading || error) return;
+    if(isProcessing.current) return;
   
     // Check if the user was moving, if yes, do not trigger the click handler
     if (!isMoving.current && !isDrawing && canvasRef.current && !isTouchEvent.current) {
-      handleCanvasClick(
+      isProcessing.current = true;
+      await handleCanvasClick(
         event as React.MouseEvent<HTMLCanvasElement>, 
         canvasRef.current, 
         maskDataList, 
@@ -137,6 +140,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
         setCountourPointsList,
         selectedColor
       );
+      isProcessing.current = false;
     }
   
     startPosition.current = null;
