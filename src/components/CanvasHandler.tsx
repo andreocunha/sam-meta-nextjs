@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useCanvas } from '@/hooks/useCanvas';
 import { toggleScrollAndTouchBehavior } from '@/utils/touch';
-import { FaSave, FaCircle, FaEraser } from 'react-icons/fa';
+import { FaSave, FaCircle, FaTrash } from 'react-icons/fa';
 import { MdDraw } from "react-icons/md";
 
 export const CanvasHandler: React.FC = () => {
@@ -55,7 +55,7 @@ export const CanvasHandler: React.FC = () => {
       <nav className="fixed top-0 right-0 w-full md:w-[300px] md:right-0 bg-gray-800 text-white z-10 flex justify-between items-center p-4 md:rounded-bl-md shadow-md">
         <div className="flex space-x-2 items-center">
           <button onClick={() => cleanAll()} className="text-white p-2">
-            <FaEraser size={20} />
+            <FaTrash size={16} />
           </button>
           <div className="relative">
             <button onClick={() => setDropdownOpen(!dropdownOpen)} className="bg-gray-700 p-2 rounded flex items-center">
@@ -78,7 +78,7 @@ export const CanvasHandler: React.FC = () => {
           </div>
           
           <button onClick={toggleDrawingMode} className={`text-white p-2 rounded border ${isDrawing ? 'border-white' : 'border-transparent'}`}>
-            <MdDraw size={20} />
+            <MdDraw size={22} />
           </button>
         </div>
         <div className="flex space-x-4 items-center">
