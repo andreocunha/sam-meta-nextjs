@@ -158,9 +158,9 @@ export function drawPointAndArc(
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
+    color: string = 'red',
     pointRadius: number = 20,
     arcRadius: number = 100,
-    color: string = 'red',
     arcWidth: number = 20
 ) {
     // Desenhar o ponto vermelho

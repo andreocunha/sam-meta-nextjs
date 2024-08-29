@@ -16,6 +16,7 @@ export async function initializeCanvas(canvas: HTMLCanvasElement): Promise<{ suc
         }
 
         const img = new Image();
+        img.crossOrigin = 'anonymous';
         img.src = IMAGE_SRC;
 
         await new Promise((resolve, reject) => {
@@ -86,7 +87,7 @@ export async function handleCanvasClick(
     const imageDataBeforeDraw = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // Desenhar ponto e arco temporários
-    drawPointAndArc(ctx, x, y);
+    drawPointAndArc(ctx, x, y, color);
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Restaurar a imagem ao estado anterior (remove ponto e arco)

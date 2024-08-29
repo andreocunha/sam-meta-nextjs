@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject, useRef, use } from 'react';
+import { useState, useEffect, RefObject, useRef } from 'react';
 import { initializeCanvas, handleCanvasClick, createMaskFromDrawing } from '@/utils/canvasUtils';
 
 export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
