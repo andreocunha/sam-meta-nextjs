@@ -24,9 +24,11 @@ export const CanvasHandler: React.FC = () => {
   } = useCanvas(canvasRef);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showDrawingLabel, setShowDrawingLabel] = useState(false);
 
   useEffect(() => {
     toggleScrollAndTouchBehavior(isDrawing);
+    setShowDrawingLabel(isDrawing);
 
     return () => {
       toggleScrollAndTouchBehavior(false);
@@ -80,6 +82,11 @@ export const CanvasHandler: React.FC = () => {
           </button>
         </div>
       </nav>
+      {showDrawingLabel && (
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-3 rounded z-40">
+          Modo Desenho Ativado
+        </div>
+      )}
       <TransformWrapper
         disabled={isDrawing}
         wheel={{ step: 0.1 }}
