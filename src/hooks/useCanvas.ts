@@ -210,9 +210,19 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
     }));
   
     localStorage.setItem('contourPointsList', JSON.stringify(relativeContours));
+
+    alert('Dados salvos com sucesso!');
   }
   
 
+  function cleanAll(){
+    if(confirm('Deseja limpar todos os desenhos?')){
+      setMaskDataList([]);
+      setCountourPointsList([]);
+      localStorage.removeItem('contourPointsList');
+      window.location.reload();
+    }
+  }
   
 
   return { 
@@ -225,6 +235,7 @@ export function useCanvas(canvasRef: RefObject<HTMLCanvasElement>) {
     toggleDrawingMode,
     saveAllContoursPoints,
     setSelectedColor,
+    cleanAll,
     selectedColor,
     isDrawing,
     loading, 
