@@ -52,6 +52,11 @@ export const CanvasHandler: React.FC = () => {
 
   return (
     <div className="relative">
+      {showDrawingLabel && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 transform bg-black/80 text-white text-xs py-1 px-3 rounded z-40">
+          Modo Desenho Ativado
+        </div>
+      )}
       <nav className="fixed top-0 right-0 w-full md:w-[300px] md:right-0 bg-gray-800 text-white z-10 flex justify-between items-center p-4 md:rounded-bl-md shadow-md">
         <div className="flex space-x-2 items-center">
           <button onClick={() => cleanAll()} className="text-white p-2">
@@ -87,11 +92,6 @@ export const CanvasHandler: React.FC = () => {
           </button>
         </div>
       </nav>
-      {showDrawingLabel && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-3 rounded z-40">
-          Modo Desenho Ativado
-        </div>
-      )}
       <TransformWrapper
         disabled={isDrawing}
         wheel={{ step: 0.1 }}
