@@ -53,7 +53,7 @@ export async function generateAndDownloadMask(file: File): Promise<string | void
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
-    a.download = 'api_result.bin';
+    a.download = `${file.name.replace(/\.[^/.]+$/, '')}.bin`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
